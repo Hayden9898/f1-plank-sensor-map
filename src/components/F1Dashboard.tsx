@@ -43,7 +43,10 @@ const F1Dashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    <div 
+      className="min-h-screen p-6" 
+      style={{ background: 'linear-gradient(135deg, #13133B 50%, #3C388C 100%)' }}
+    >
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center mb-8">
@@ -52,7 +55,7 @@ const F1Dashboard = () => {
         </div>
 
         {/* F1 Car Bottom View */}
-        <Card className="bg-gray-800/50 border-gray-700">
+        <Card className="border-gray-700" style={{ backgroundColor: '#13133B' }}>
           <CardHeader>
             <CardTitle className="text-white text-xl">Car Underfloor View</CardTitle>
           </CardHeader>
@@ -62,7 +65,7 @@ const F1Dashboard = () => {
         </Card>
 
         {/* Sensor Waveforms */}
-        <Card className="bg-gray-800/50 border-gray-700">
+        <Card className="border-gray-700" style={{ backgroundColor: '#13133B' }}>
           <CardHeader>
             <CardTitle className="text-white text-xl">Sensor Data Waveforms</CardTitle>
           </CardHeader>
@@ -76,7 +79,7 @@ const F1Dashboard = () => {
         </Card>
 
         {/* Bar Chart */}
-        <Card className="bg-gray-800/50 border-gray-700">
+        <Card className="border-gray-700" style={{ backgroundColor: '#13133B' }}>
           <CardHeader>
             <CardTitle className="text-white text-xl">Current Sensor Readings</CardTitle>
           </CardHeader>
