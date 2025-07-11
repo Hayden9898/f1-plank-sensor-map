@@ -1,24 +1,483 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>plank-toon-sensor-view</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Plank Sensor Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <meta property="og:title" content="plank-toon-sensor-view" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #13133B 50%, #3C388C 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #ccc;
+        }
+
+        .card {
+            background-color: #13133B;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .car-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .car-svg {
+            width: 500px;
+            height: 300px;
+        }
+
+        .sensor-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 6px;
+            backdrop-filter: blur(10px);
+            font-size: 0.75rem;
+        }
+
+        .sensor-info h3 {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .sensor-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .sensor-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .sensor-name {
+            min-width: 80px;
+            font-weight: 500;
+        }
+
+        .sensor-value {
+            color: #68d391;
+            font-family: monospace;
+        }
+
+        .graph-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .chart-wrapper {
+            flex: 1;
+            background: #1a1a1a;
+            border-radius: 8px;
+            border: 1px solid #4a5568;
+            position: relative;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+        }
+
+        .current-readings {
+            width: 250px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #4a5568;
+        }
+
+        .current-readings h3 {
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .reading-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .reading-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .reading-value {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .chart-legend {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>F1 Plank Sensor Monitor</h1>
+            <p>Real-time monitoring of underfloor sensor readings</p>
+        </div>
+
+        <!-- F1 Car Diagram -->
+        <div class="card">
+            <h2 class="card-title">Car Underfloor View</h2>
+            <div class="car-container">
+                <svg class="car-svg" viewBox="0 0 800 600">
+                    <defs>
+                        <linearGradient id="carBodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#2a2a2a" />
+                            <stop offset="50%" stop-color="#3d3d3d" />
+                            <stop offset="100%" stop-color="#1a1a1a" />
+                        </linearGradient>
+                        <linearGradient id="plankGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#d4af37" />
+                            <stop offset="50%" stop-color="#ffd700" />
+                            <stop offset="100%" stop-color="#b8860b" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge> 
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Wheels -->
+                    <ellipse cx="100" cy="150" rx="45" ry="45" fill="#1a1a1a" stroke="#333" stroke-width="3"/>
+                    <ellipse cx="700" cy="150" rx="45" ry="45" fill="#1a1a1a" stroke="#333" stroke-width="3"/>
+                    <ellipse cx="100" cy="450" rx="45" ry="45" fill="#1a1a1a" stroke="#333" stroke-width="3"/>
+                    <ellipse cx="700" cy="450" rx="45" ry="45" fill="#1a1a1a" stroke="#333" stroke-width="3"/>
+
+                    <!-- Main Car Body -->
+                    <path d="M 200 80 L 600 80 L 650 120 L 680 200 L 680 400 L 650 480 L 600 520 L 200 520 L 150 480 L 120 400 L 120 200 L 150 120 Z"
+                          fill="url(#carBodyGradient)" stroke="#444" stroke-width="2"/>
+
+                    <!-- Wooden Plank -->
+                    <rect x="250" y="200" width="300" height="200" rx="15" 
+                          fill="url(#plankGradient)" stroke="#b8860b" stroke-width="3" opacity="0.9"/>
+
+                    <!-- Sensors -->
+                    <circle id="sensorFL" cx="350" cy="250" r="18" class="pulse" filter="url(#glow)"/>
+                    <text x="350" y="256" text-anchor="middle" fill="white" font-size="10" font-weight="bold">FL</text>
+
+                    <circle id="sensorFR" cx="450" cy="250" r="18" class="pulse" filter="url(#glow)"/>
+                    <text x="450" y="256" text-anchor="middle" fill="white" font-size="10" font-weight="bold">FR</text>
+
+                    <circle id="sensorRL" cx="350" cy="350" r="18" class="pulse" filter="url(#glow)"/>
+                    <text x="350" y="356" text-anchor="middle" fill="white" font-size="10" font-weight="bold">RL</text>
+
+                    <circle id="sensorRR" cx="450" cy="350" r="18" class="pulse" filter="url(#glow)"/>
+                    <text x="450" y="356" text-anchor="middle" fill="white" font-size="10" font-weight="bold">RR</text>
+                </svg>
+
+                <div class="sensor-info">
+                    <h3>SENSOR READINGS</h3>
+                    <div id="sensorReadings"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combined Graph and Current Readings -->
+        <div class="card">
+            <h2 class="card-title">Sensor Data Monitor</h2>
+            <div class="graph-container">
+                <div class="chart-wrapper">
+                    <canvas id="chartCanvas" class="chart-canvas"></canvas>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background-color: #FF6B6B;"></div>
+                            <span>Front Left</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background-color: #4ECDC4;"></div>
+                            <span>Front Right</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background-color: #45B7D1;"></div>
+                            <span>Rear Left</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background-color: #96CEB4;"></div>
+                            <span>Rear Right</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="current-readings">
+                    <h3>Current Values</h3>
+                    <div id="currentReadings"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sensor data management
+        const sensors = [
+            { id: 'FL', name: 'Front Left', value: 50, history: [], color: '#FF6B6B', element: 'sensorFL' },
+            { id: 'FR', name: 'Front Right', value: 45, history: [], color: '#4ECDC4', element: 'sensorFR' },
+            { id: 'RL', name: 'Rear Left', value: 55, history: [], color: '#45B7D1', element: 'sensorRL' },
+            { id: 'RR', name: 'Rear Right', value: 48, history: [], color: '#96CEB4', element: 'sensorRR' }
+        ];
+
+        // Canvas setup
+        const canvas = document.getElementById('chartCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+
+        function drawChart() {
+            const rect = canvas.getBoundingClientRect();
+            
+            // Clear canvas
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, rect.width, rect.height);
+
+            // Draw grid
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 0.5;
+            
+            // Horizontal grid lines
+            for (let i = 0; i <= 10; i++) {
+                const y = (rect.height / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(rect.width, y);
+                ctx.stroke();
+            }
+
+            // Vertical grid lines
+            for (let i = 0; i <= 20; i++) {
+                const x = (rect.width / 20) * i;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, rect.height);
+                ctx.stroke();
+            }
+
+            // Draw Y-axis labels
+            ctx.fillStyle = '#888';
+            ctx.font = '10px monospace';
+            ctx.textAlign = 'right';
+            
+            for (let i = 0; i <= 10; i++) {
+                const value = (100 - i * 10).toString();
+                const y = (rect.height / 10) * i + 3;
+                ctx.fillText(value, rect.width - 5, y);
+            }
+
+            // Draw sensor lines
+            sensors.forEach(sensor => {
+                if (sensor.history.length > 1) {
+                    ctx.strokeStyle = sensor.color;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+
+                    const pointSpacing = rect.width / Math.max(sensor.history.length - 1, 1);
+                    
+                    sensor.history.forEach((value, index) => {
+                        const x = index * pointSpacing;
+                        const y = rect.height - (value / 100) * rect.height;
+                        
+                        if (index === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    });
+
+                    ctx.stroke();
+
+                    // Add glow effect
+                    ctx.shadowColor = sensor.color;
+                    ctx.shadowBlur = 10;
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+
+                    // Draw current value indicator
+                    if (sensor.history.length > 0) {
+                        const lastValue = sensor.history[sensor.history.length - 1];
+                        const lastY = rect.height - (lastValue / 100) * rect.height;
+                        
+                        ctx.fillStyle = sensor.color;
+                        ctx.beginPath();
+                        ctx.arc(rect.width - 5, lastY, 4, 0, 2 * Math.PI);
+                        ctx.fill();
+                        
+                        ctx.shadowColor = sensor.color;
+                        ctx.shadowBlur = 15;
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                    }
+                }
+            });
+
+            // Draw X-axis label
+            ctx.fillStyle = '#888';
+            ctx.font = '10px monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText('Time →', 5, rect.height - 5);
+        }
+
+        function updateSensorDisplay() {
+            // Update sensor info panel
+            const sensorReadings = document.getElementById('sensorReadings');
+            sensorReadings.innerHTML = sensors.map(sensor => `
+                <div class="sensor-item">
+                    <div class="sensor-dot" style="background-color: ${sensor.color};"></div>
+                    <span class="sensor-name">${sensor.name}</span>
+                    <span class="sensor-value">${sensor.value.toFixed(1)}</span>
+                    <span style="color: #999; font-size: 0.7rem;">units</span>
+                </div>
+            `).join('');
+
+            // Update current readings panel
+            const currentReadings = document.getElementById('currentReadings');
+            currentReadings.innerHTML = sensors.map(sensor => `
+                <div class="reading-item">
+                    <div class="reading-label">
+                        <div class="reading-dot" style="background-color: ${sensor.color};"></div>
+                        <span>${sensor.name}</span>
+                    </div>
+                    <span class="reading-value">${sensor.value.toFixed(1)}</span>
+                </div>
+            `).join('');
+
+            // Update car diagram sensors
+            sensors.forEach(sensor => {
+                const element = document.getElementById(sensor.element);
+                if (element) {
+                    element.setAttribute('fill', sensor.color);
+                    element.setAttribute('opacity', Math.min(100, Math.max(10, sensor.value)) / 100);
+                }
+            });
+        }
+
+        function updateSensorData() {
+            sensors.forEach(sensor => {
+                const variation = (Math.random() - 0.5) * 10;
+                sensor.value = Math.max(0, Math.min(100, sensor.value + variation));
+                sensor.history.push(sensor.value);
+                
+                // Keep last 50 readings
+                if (sensor.history.length > 50) {
+                    sensor.history.shift();
+                }
+            });
+
+            updateSensorDisplay();
+            drawChart();
+        }
+
+        // Initialize
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            drawChart();
+        });
+
+        resizeCanvas();
+        updateSensorDisplay();
+        drawChart();
+
+        // Start simulation
+        setInterval(updateSensorData, 200);
+    </script>
+</body>
 </html>
